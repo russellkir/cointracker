@@ -102,7 +102,7 @@ class CoinPK:
         return self.ca.get_balance()
 
     def set_balance(self, balance):
-        self.balance = balance
+        self.ca.set_balance(balance)
 
     def update_address(self, address):
         self.ca = address
@@ -136,6 +136,9 @@ class CoinAddress:
 
     def get_balance(self):
         return self.balance
+
+    def set_balance(self, balance):
+        self.balance = balance
 
     def add_transaction(self, amount, creation_time):
         self.transactions.append(Transaction(amount, creation_time))
@@ -267,6 +270,9 @@ def get_coin_balance():
     if request.method == "POST":
         coin = json["coin"]["address"]
         return jsonify(
-            {"BTC": get_member(json["member"]).wallet.get_coin_balance(coin)}
+            {
+                "BTC": get_member(json["member"]).wallet.get_coin_balance(coin)
+                / pow(10, 8)
+            }
         )
     return jsonify(success=True)

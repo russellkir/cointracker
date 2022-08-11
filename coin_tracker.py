@@ -74,6 +74,16 @@ class Wallet:
                 return coin.get_transactions()
         return []
 
+    def get_coin_balance(self, address):
+        response = requests.get("https://blockchain.info/rawaddr/{}".format(address))
+        json_data = response.json()
+        final_balance = json_data["final_balance"]
+        for coin in self.coins:
+            if coin.get_address() == address:
+                coin.set_balance(final_balance)
+                return coin.get_balance()
+        return []
+
 
 class CoinPK:
     def __init__(self, blockchain, address):
@@ -88,6 +98,12 @@ class CoinPK:
     def get_transactions(self):
         return self.ca.get_transactions()
 
+    def get_balance(self):
+        return self.ca.get_balance()
+
+    def set_balance(self, balance):
+        self.balance = balance
+
     def update_address(self, address):
         self.ca = address
 
@@ -96,6 +112,7 @@ class CoinAddress:
     def __init__(self, blockchain, address):
         self.blockchain = blockchain
         self.address = address
+        self.balance = 0
         self.transactions = []
 
     def get_blockchain(self):
@@ -116,6 +133,9 @@ class CoinAddress:
                 }
             )
         return transactions
+
+    def get_balance(self):
+        return self.balance
 
     def add_transaction(self, amount, creation_time):
         self.transactions.append(Transaction(amount, creation_time))
@@ -231,4 +251,22 @@ def get_coin_transactions():
     if request.method == "POST":
         coin = json["coin"]["address"]
         return jsonify(get_member(json["member"]).wallet.get_coin_transactions(coin))
+    return jsonify(success=True)
+
+
+@app.route("/get_coin_balance", methods=["POST"])
+def get_coin_balance():
+    """
+    Get balance given coin address
+    """
+    content_type = request.headers.get("Content-Type")
+    if content_type != "application/json":
+        return "Content-Type not supported!"
+
+    json = request.json
+    if request.method == "POST":
+        coin = json["coin"]["address"]
+        return jsonify(
+            {"BTC": get_member(json["member"]).wallet.get_coin_balance(coin)}
+        )
     return jsonify(success=True)

@@ -26,7 +26,7 @@ output: operation status
     Example: curl localhost:5000/add_coin --header "Content-Type: application/json" --request POST --data '{"member":"Russell", "coin":{"blockchain":"bitcoin","address":"3E8ociqZa9mZUSwGdSmAEMAoAxBK3FNDcd"}}'
 
     Example: curl localhost:5000/add_coin --header "Content-Type: application/json" --request POST --data '{"member":"Russell", "coin":{"blockchain":"bitcoin","address":"bc1q0sg9rdst255gtldsmcf8rk0764avqy2h2ksqs5"}}'
-    
+
 input: {"member": member name, "coin": {"blockchain": chain name, "address": coin address}}
 output: operation status
 
@@ -53,3 +53,9 @@ output: list of coins in member wallet
 
 input: {"member": member name, "coin": { "address": coin address}} 
 output: list of transactions
+
+### Get coin balance
+    Example: curl localhost:5000/get_coin_balance --header "Content-Type: application/json" --request POST --data '{"member":"Russell","coin":{"address":"bc1q0sg9rdst255gtldsmcf8rk0764avqy2h2ksqs5"}}'
+
+input: {"member": member name, "coin": { "address": coin address}} 
+output: balance in BTC

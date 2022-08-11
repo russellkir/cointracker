@@ -34,7 +34,7 @@ class Wallet:
         """
         found = False
         for coin in self.coins:
-            if coin.get_address().get_address() == old_address:
+            if coin.get_address() == old_address:
                 coin.update_address(new_address)
                 found = True
         return found
@@ -55,7 +55,10 @@ class Wallet:
         """
         wallet = []
         for coin in self.coins:
-            wallet.append(coin.get_address())
+            transactions = coin.get_transactions()
+            wallet.append(
+                {"coin: ": coin.get_address(), "transactions: ": transactions}
+            )
         return wallet
 
     def get_coin_transactions(self, address):
@@ -74,19 +77,19 @@ class Wallet:
 
 class CoinPK:
     def __init__(self, blockchain, address):
-        self.address = CoinAddress(blockchain, address)
+        self.ca = CoinAddress(blockchain, address)
 
     def get_address(self):
-        return self.address.get_address()
+        return self.ca.get_address()
 
     def add_transaction(self, amount, creation):
-        self.address.add_transaction(amount, creation)
+        self.ca.add_transaction(amount, creation)
 
     def get_transactions(self):
-        return self.address.get_transactions()
+        return self.ca.get_transactions()
 
     def update_address(self, address):
-        self.address = address
+        self.ca = address
 
 
 class CoinAddress:

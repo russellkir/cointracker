@@ -4,6 +4,9 @@
 
     source ./setup.sh
 
+## Run application
+    flask --app coin_tracker.py --debug run
+    
 ## Usage
 API examples below
 
@@ -22,6 +25,8 @@ output: operation status
 ### Add coin
     Example: curl localhost:5000/add_coin --header "Content-Type: application/json" --request POST --data '{"member":"Russell", "coin":{"blockchain":"bitcoin","address":"3E8ociqZa9mZUSwGdSmAEMAoAxBK3FNDcd"}}'
 
+    Example: curl localhost:5000/add_coin --header "Content-Type: application/json" --request POST --data '{"member":"Russell", "coin":{"blockchain":"bitcoin","address":"bc1q0sg9rdst255gtldsmcf8rk0764avqy2h2ksqs5"}}'
+    
 input: {"member": member name, "coin": {"blockchain": chain name, "address": coin address}}
 output: operation status
 
@@ -42,3 +47,9 @@ output: operation status
 
 input: {"member": member name}
 output: list of coins in member wallet
+
+### Get coin transactions
+    Example: curl localhost:5000/get_coin_transactions --header "Content-Type: application/json" --request POST --data '{"member":"Russell","coin":{"address":"bc1q0sg9rdst255gtldsmcf8rk0764avqy2h2ksqs5"}}'
+
+input: {"member": member name, "coin": { "address": coin address}} 
+output: list of transactions

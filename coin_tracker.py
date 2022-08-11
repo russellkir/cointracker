@@ -1,6 +1,6 @@
-from operator import truediv
 from flask import Flask, request, jsonify
 import datetime
+import requests, json
 
 app = Flask(__name__)
 
@@ -11,6 +11,9 @@ class CTMember:
         self.wallet = Wallet(self.name)
         self.created_at = datetime.datetime.now()
 
+    def get_name(self):
+        return self.name
+
 
 class Wallet:
     def __init__(self, member):
@@ -19,11 +22,11 @@ class Wallet:
         self.created_at = datetime.datetime.now()
         self.coins = []
 
-    def add_address(self, address):
+    def add_address(self, blockchain, address):
         """
         Method to add a coin's address in a member's wallet
         """
-        self.coins.append(CoinPK(address))
+        self.coins.append(CoinPK(blockchain, address))
 
     def update_address(self, old_address, new_address):
         """
@@ -31,7 +34,7 @@ class Wallet:
         """
         found = False
         for coin in self.coins:
-            if coin.address == old_address:
+            if coin.get_address().get_address() == old_address:
                 coin.update_address(new_address)
                 found = True
         return found
@@ -41,7 +44,7 @@ class Wallet:
         Method to add an address to a member's wallet
         """
         for coin in self.coins:
-            if coin.address == address:
+            if coin.get_address() == address:
                 self.coins.remove(coin)
                 return True
         return False
@@ -52,13 +55,35 @@ class Wallet:
         """
         wallet = []
         for coin in self.coins:
-            wallet.append(coin.address)
+            wallet.append(coin.get_address())
         return wallet
+
+    def get_coin_transactions(self, address):
+        response = requests.get("https://blockchain.info/rawaddr/{}".format(address))
+        json_data = response.json()
+        transactions = json_data["txs"]
+        for coin in self.coins:
+            if coin.get_address() == address:
+                for transaction in transactions:
+                    coin.add_transaction(
+                        transaction["out"][0]["value"], transaction["time"]
+                    )
+                return coin.get_transactions()
+        return []
 
 
 class CoinPK:
-    def __init__(self, address):
-        self.address = address
+    def __init__(self, blockchain, address):
+        self.address = CoinAddress(blockchain, address)
+
+    def get_address(self):
+        return self.address.get_address()
+
+    def add_transaction(self, amount, creation):
+        self.address.add_transaction(amount, creation)
+
+    def get_transactions(self):
+        return self.address.get_transactions()
 
     def update_address(self, address):
         self.address = address
@@ -70,11 +95,28 @@ class CoinAddress:
         self.address = address
         self.transactions = []
 
+    def get_blockchain(self):
+        return self.blockchain
+
+    def get_address(self):
+        return self.address
+
+    def get_transactions(self):
+        transactions = []
+        for transaction in self.transactions:
+            transactions.append(
+                {"amount": transaction.amount, "created_at": transaction.created_at}
+            )
+        return transactions
+
+    def add_transaction(self, amount, creation_time):
+        self.transactions.append(Transaction(amount, creation_time))
+
 
 class Transaction:
-    def __init__(self, address):
-        self.created_at = datetime.datetime.now()
-        self.address = address
+    def __init__(self, amount, creation_time):
+        self.created_at = creation_time
+        self.amount = amount
 
 
 coin_tracker = []
@@ -87,7 +129,7 @@ def hello():
 
 def get_member(name):
     for member in coin_tracker:
-        if member.name == name:
+        if member.get_name() == name:
             return member
 
 
@@ -129,7 +171,9 @@ def add_coin():
 
     json = request.json
     if request.method == "POST":
-        get_member(json["member"]).wallet.add_address(json["coin"]["address"])
+        get_member(json["member"]).wallet.add_address(
+            json["coin"]["blockchain"], json["coin"]["address"]
+        )
     return jsonify(success=True)
 
 
@@ -163,4 +207,20 @@ def get_wallet():
     if request.method == "GET":
         return jsonify(get_member(json["member"]).wallet.get_coins())
 
+    return jsonify(success=True)
+
+
+@app.route("/get_coin_transactions", methods=["POST"])
+def get_coin_transactions():
+    """
+    Get transactions given coin address
+    """
+    content_type = request.headers.get("Content-Type")
+    if content_type != "application/json":
+        return "Content-Type not supported!"
+
+    json = request.json
+    if request.method == "POST":
+        coin = json["coin"]["address"]
+        return jsonify(get_member(json["member"]).wallet.get_coin_transactions(coin))
     return jsonify(success=True)

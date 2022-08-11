@@ -4,3 +4,4 @@
 
 export FLASK_APP=coin_tracker
 export FLASK_ENV=development
+pip install -r requirements.txt

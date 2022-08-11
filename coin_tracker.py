@@ -32,7 +32,7 @@ class Wallet:
         found = False
         for coin in self.coins:
             if coin.address == old_address:
-                coin.address = new_address
+                coin.update_address(new_address)
                 found = True
         return found
 

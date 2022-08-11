@@ -23,26 +23,16 @@ class Wallet:
         self.coins = []
 
     def add_address(self, blockchain, address):
-        """
-        Method to add a coin's address in a member's wallet
-        """
         self.coins.append(CoinPK(blockchain, address))
 
     def update_address(self, old_address, new_address):
-        """
-        Method to update a coin's address to a member's wallet
-        """
-        found = False
         for coin in self.coins:
             if coin.get_address() == old_address:
                 coin.update_address(new_address)
-                found = True
-        return found
+                return True
+        return False
 
     def delete_address(self, address):
-        """
-        Method to add an address to a member's wallet
-        """
         for coin in self.coins:
             if coin.get_address() == address:
                 self.coins.remove(coin)
@@ -61,7 +51,7 @@ class Wallet:
             )
         return wallet
 
-    def get_coin_transactions(self, address):
+    def sync_coin_transactions(self, address):
         response = requests.get("https://blockchain.info/rawaddr/{}".format(address))
         json_data = response.json()
         transactions = json_data["txs"]
@@ -71,16 +61,19 @@ class Wallet:
                     coin.add_transaction(
                         transaction["out"][0]["value"], transaction["time"]
                     )
+                coin.set_balance(json_data["final_balance"])
+                return True
+        return False
+
+    def get_coin_transactions(self, address):
+        for coin in self.coins:
+            if coin.get_address() == address:
                 return coin.get_transactions()
         return []
 
     def get_coin_balance(self, address):
-        response = requests.get("https://blockchain.info/rawaddr/{}".format(address))
-        json_data = response.json()
-        final_balance = json_data["final_balance"]
         for coin in self.coins:
             if coin.get_address() == address:
-                coin.set_balance(final_balance)
                 return coin.get_balance()
         return []
 
@@ -238,6 +231,22 @@ def get_wallet():
     if request.method == "GET":
         return jsonify(get_member(json["member"]).wallet.get_coins())
 
+    return jsonify(success=True)
+
+
+@app.route("/sync_coin_transactions", methods=["POST"])
+def sync_coin_transactions():
+    """
+    Sync transactions given coin address
+    """
+    content_type = request.headers.get("Content-Type")
+    if content_type != "application/json":
+        return "Content-Type not supported!"
+
+    json = request.json
+    if request.method == "POST":
+        coin = json["coin"]["address"]
+        return jsonify(get_member(json["member"]).wallet.sync_coin_transactions(coin))
     return jsonify(success=True)
 
 

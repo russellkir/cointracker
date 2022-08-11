@@ -48,6 +48,12 @@ output: operation status
 input: {"member": member name}
 output: list of coins in member wallet
 
+### Sync coin transactions
+    Example: curl localhost:5000/sync_coin_transactions --header "Content-Type: application/json" --request POST --data '{"member":"Russell","coin":{"address":"bc1q0sg9rdst255gtldsmcf8rk0764avqy2h2ksqs5"}}'
+
+input: {"member": member name, "coin": { "address": coin address}} 
+output: operation status
+
 ### Get coin transactions
     Example: curl localhost:5000/get_coin_transactions --header "Content-Type: application/json" --request POST --data '{"member":"Russell","coin":{"address":"bc1q0sg9rdst255gtldsmcf8rk0764avqy2h2ksqs5"}}'
 

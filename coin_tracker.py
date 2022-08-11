@@ -17,20 +17,18 @@ class Wallet:
         self.total_value = 0
         self.member = member
         self.created_at = datetime.datetime.now()
-        self.coins = []  # will use a simple list for now to store coins
+        self.coins = []
 
     def add_address(self, address):
         """
         Method to add a coin's address in a member's wallet
         """
-        print("adding {}".format(address))
         self.coins.append(CoinPK(address))
 
     def update_address(self, old_address, new_address):
         """
         Method to update a coin's address to a member's wallet
         """
-        print("updating {} to {}".format(old_address, new_address))
         found = False
         for coin in self.coins:
             if coin.address == old_address:
@@ -42,8 +40,6 @@ class Wallet:
         """
         Method to add an address to a member's wallet
         """
-        print("adding {} for {}".format(address, self.member))
-        print("BEFORE: ", self.coins)
         for coin in self.coins:
             if coin.address == address:
                 self.coins.remove(coin)
@@ -55,9 +51,7 @@ class Wallet:
         Simply prints the coins in a member's wallet
         """
         wallet = []
-        print("Getting wallet content")
         for coin in self.coins:
-            print("Coin address: ", coin.address)
             wallet.append(coin.address)
         return wallet
 
@@ -75,8 +69,6 @@ class CoinAddress:
         self.blockchain = blockchain
         self.address = address
         self.transactions = []
-
-        # def add_transaction(self, address)
 
 
 class Transaction:

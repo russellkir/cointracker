@@ -94,11 +94,6 @@ def get_member(name):
 @app.route("/get_members", methods=["GET"])
 def get_members():
     """
-    Example: curl localhost:5000/get_members
-
-    input: None
-    output: list of members
-
     Get's all members of CoinTracker
     """
     if request.method == "GET":
@@ -111,11 +106,6 @@ def get_members():
 @app.route("/add_member", methods=["POST"])
 def add_member():
     """
-    Example: curl localhost:5000/add_member --header "Content-Type: application/json" --request POST --data '{"member":"Russell"}'
-
-    input: {"member": member name}
-    output: operation status
-
     Adds a member to the CoinTracker system (woot)
     """
     content_type = request.headers.get("Content-Type")
@@ -131,11 +121,6 @@ def add_member():
 @app.route("/add_coin", methods=["POST"])
 def add_coin():
     """
-    Example: curl localhost:5000/add_coin --header "Content-Type: application/json" --request POST --data '{"member":"Russell", "coin":{"blockchain":"bitcoin","address":"3E8ociqZa9mZUSwGdSmAEMAoAxBK3FNDcd"}}'
-
-    input: {"member": member name, "coin": {"blockchain": chain name, "address": coin address}}
-    output: operation status
-
     Adds a coin to a member's wallet
     """
     content_type = request.headers.get("Content-Type")
@@ -151,11 +136,6 @@ def add_coin():
 @app.route("/update_coin", methods=["POST", "DELETE"])
 def update_coin():
     """
-    Example update: curl localhost:5000/update_coin --header "Content-Type: application/json" --request POST --data '{"member":"Russell", "coin":{"blockchain":"bitcoin","old_address":"3E8ociqZa9mZUSwGdSmAEMAoAxBK3FNDcd","new_address":"3E8ociqZa9mZUSwGdSmAEMAoAxBK3FNDcd3"}}'
-
-    input: {"member": member name, "coin": {"blockchain": chain name, "old address": original coin address, "new address": new address with which to update}}
-    output: operation status
-
     Updates the address of a coin
     """
     content_type = request.headers.get("Content-Type")
@@ -177,11 +157,6 @@ def update_coin():
 @app.route("/get_wallet", methods=["GET"])
 def get_wallet():
     """
-    Example: curl localhost:5000/get_wallet --header "Content-Type: application/json" --request GET --data '{"member":"Russell"}'
-
-    input: {"member": member name}
-    output: list of coins in member wallet
-
     Get's the content of a member's wallet
     """
     json = request.json

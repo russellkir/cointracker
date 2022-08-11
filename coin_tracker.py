@@ -105,7 +105,12 @@ class CoinAddress:
         transactions = []
         for transaction in self.transactions:
             transactions.append(
-                {"amount": transaction.amount, "created_at": transaction.created_at}
+                {
+                    "amount": transaction.amount,
+                    "created_at": datetime.datetime.fromtimestamp(
+                        transaction.created_at
+                    ),
+                }
             )
         return transactions
 

@@ -52,10 +52,14 @@ class Wallet:
         return wallet
 
     def sync_coin_transactions(self, address):
+        """
+        Syncs a coin, that must be in a members wallet, to get all transactions and final balance
+        """
         response = requests.get("https://blockchain.info/rawaddr/{}".format(address))
         json_data = response.json()
         transactions = json_data["txs"]
         for coin in self.coins:
+            # this could be cleaned up and refactored
             if coin.get_address() == address:
                 for transaction in transactions:
                     coin.add_transaction(transaction["result"], transaction["time"])
@@ -64,6 +68,7 @@ class Wallet:
         return False
 
     def get_coin_transactions(self, address):
+        # these loops could be refactored with the get_coin_balance below
         for coin in self.coins:
             if coin.get_address() == address:
                 return coin.get_transactions()
@@ -78,6 +83,7 @@ class Wallet:
 
 class CoinPK:
     def __init__(self, blockchain, address):
+        # recognizing this isn't as ideal as I initially expected
         self.ca = CoinAddress(blockchain, address)
 
     def get_address(self):
@@ -103,7 +109,8 @@ class CoinAddress:
     def __init__(self, blockchain, address):
         self.blockchain = blockchain
         self.address = address
-        self.balance = 0
+        self.created_at = datetime.datetime.now()
+        self.balance = 0  # to start, could update to set an initial balance if we sync transactions on creation
         self.transactions = []
 
     def get_blockchain(self):
@@ -141,12 +148,8 @@ class Transaction:
         self.amount = amount
 
 
+# simple structure to hold in-memory CoinTracker system
 coin_tracker = []
-
-
-@app.route("/")
-def hello():
-    return "Hello, World!"
 
 
 def get_member(name):
@@ -281,7 +284,7 @@ def get_coin_balance():
         return jsonify(
             {
                 "BTC": get_member(json["member"]).wallet.get_coin_balance(coin)
-                / pow(10, 8)
+                / pow(10, 8)  # decimal appears off by 8 from looking online
             }
         )
     return jsonify(success=True)

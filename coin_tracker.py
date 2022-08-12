@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import datetime
-import requests, json
+import requests
 
 app = Flask(__name__)
 
@@ -39,10 +39,7 @@ class Wallet:
                 return True
         return False
 
-    def get_coins(self):
-        """
-        Simply prints the coins in a member's wallet
-        """
+    def get_wallet(self):
         wallet = []
         for coin in self.coins:
             transactions = coin.get_transactions()
@@ -226,11 +223,11 @@ def update_coin():
 @app.route("/get_wallet", methods=["GET"])
 def get_wallet():
     """
-    Get's the content of a member's wallet
+    Get the content of a member's wallet as list of coins and transactions
     """
     json = request.json
     if request.method == "GET":
-        return jsonify(get_member(json["member"]).wallet.get_coins())
+        return jsonify(get_member(json["member"]).wallet.get_wallet())
 
     return jsonify(success=False)
 
@@ -238,7 +235,7 @@ def get_wallet():
 @app.route("/sync_coin_transactions", methods=["POST"])
 def sync_coin_transactions():
     """
-    Sync transactions given coin address
+    Sync transactions for a given coin address
     """
     content_type = request.headers.get("Content-Type")
     if content_type != "application/json":
@@ -256,7 +253,7 @@ def sync_coin_transactions():
 @app.route("/get_coin_transactions", methods=["POST"])
 def get_coin_transactions():
     """
-    Get transactions given coin address
+    Get transactions for a given coin address
     """
     content_type = request.headers.get("Content-Type")
     if content_type != "application/json":
@@ -272,7 +269,7 @@ def get_coin_transactions():
 @app.route("/get_coin_balance", methods=["POST"])
 def get_coin_balance():
     """
-    Get balance given coin address
+    Get balance for a given coin address
     """
     content_type = request.headers.get("Content-Type")
     if content_type != "application/json":

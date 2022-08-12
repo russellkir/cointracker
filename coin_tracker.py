@@ -281,7 +281,7 @@ def get_coin_balance():
         return jsonify(
             {
                 "BTC": get_member(json["member"]).wallet.get_coin_balance(coin)
-                # / pow(10, 8)
+                / pow(10, 8)
             }
         )
     return jsonify(success=True)

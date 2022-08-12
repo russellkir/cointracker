@@ -5,10 +5,13 @@
     source ./setup.sh
 
 ## Run application
+
+Run the following command in one terminal after running setup script at least once
+
     flask --app coin_tracker.py --debug run
     
 ## Usage
-API examples below
+API examples below.  Make sure application is running.
 
 ### Get members
     Example: curl localhost:5000/get_members

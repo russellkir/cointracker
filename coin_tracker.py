@@ -58,9 +58,7 @@ class Wallet:
         for coin in self.coins:
             if coin.get_address() == address:
                 for transaction in transactions:
-                    coin.add_transaction(
-                        transaction["out"][0]["value"], transaction["time"]
-                    )
+                    coin.add_transaction(transaction["result"], transaction["time"])
                 coin.set_balance(json_data["final_balance"])
                 return True
         return False
@@ -231,7 +229,7 @@ def get_wallet():
     if request.method == "GET":
         return jsonify(get_member(json["member"]).wallet.get_coins())
 
-    return jsonify(success=True)
+    return jsonify(success=False)
 
 
 @app.route("/sync_coin_transactions", methods=["POST"])
@@ -246,8 +244,10 @@ def sync_coin_transactions():
     json = request.json
     if request.method == "POST":
         coin = json["coin"]["address"]
-        return jsonify(get_member(json["member"]).wallet.sync_coin_transactions(coin))
-    return jsonify(success=True)
+        return jsonify(
+            success=get_member(json["member"]).wallet.sync_coin_transactions(coin)
+        )
+    return jsonify(success=False)
 
 
 @app.route("/get_coin_transactions", methods=["POST"])
@@ -263,7 +263,7 @@ def get_coin_transactions():
     if request.method == "POST":
         coin = json["coin"]["address"]
         return jsonify(get_member(json["member"]).wallet.get_coin_transactions(coin))
-    return jsonify(success=True)
+    return jsonify(success=False)
 
 
 @app.route("/get_coin_balance", methods=["POST"])
@@ -281,7 +281,7 @@ def get_coin_balance():
         return jsonify(
             {
                 "BTC": get_member(json["member"]).wallet.get_coin_balance(coin)
-                / pow(10, 8)
+                # / pow(10, 8)
             }
         )
     return jsonify(success=True)
